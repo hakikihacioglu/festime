@@ -57,7 +57,7 @@ export default function LoginPage() {
         <button type="submit">Login</button>
       </form>
       <p>
-        Don't have an account? <Link href="/auth/register">Register</Link>
+        Don&apos;t have an account? <Link href="/auth/register">Register</Link>
       </p>
     </div>
   );

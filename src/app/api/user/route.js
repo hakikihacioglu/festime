@@ -1,14 +1,15 @@
 import { getTokens } from 'next-firebase-auth-edge';
-import { cookies as nextCookies } from 'next/headers';
+import { cookies } from 'next/headers';
 import { firebaseClientConfig, firebaseServerConfig } from '../../../config/firebase';
-
-export async function GET(request) {
+export const dynamic = 'force-dynamic';
+export async function GET() {
   try {
-    const cookies = nextCookies({ req: request });
+    // Access cookies synchronously
+    const cookieStore = cookies();
 
     let tokens;
     try {
-      tokens = await getTokens(cookies, {
+      tokens = await getTokens(cookieStore, {
         apiKey: firebaseClientConfig.apiKey,
         cookieName: firebaseServerConfig.cookieName,
         cookieSignatureKeys: firebaseServerConfig.cookieSignatureKeys,
