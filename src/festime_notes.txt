@@ -1,0 +1,262 @@
+Project Idea: Advanced Ticketing System with Firebase Integration and Future API Transition
+Domain: https://festi.me
+
+Overview: This project is a comprehensive ticketing system designed for organizations to efficiently manage events, products, orders, tickets, check-ins, and view statistics. The system utilizes Next.js with the App Router, Firebase Authentication, Firestore, Server Components, and <Suspense> for optimized performance and user experience. Initially, the system will directly interact with Firestore, with plans to transition to using an API that interfaces with Firebase Cloud Functions for Firestore CRUD operations.
+
+Features:
+
+Organization Registration:
+
+Organizations can sign up with an email, password, password confirmation, and a unique organization name.
+Event Management:
+
+Organizations can create and manage events.
+Product Management:
+
+Organizations can create and manage products.
+Order Management:
+
+Organizations can create and follow orders.
+Ticket Management:
+
+Organizations can create tickets from orders and manage them.
+Check-ins:
+
+Organizations can follow check-ins for events.
+Statistics:
+
+Organizations can view various statistics related to their events, products, and orders.
+Manager Invitations and Permissions:
+
+Organization owners can invite managers by filling out an invitation form.
+Invited managers receive an email with an account creation link where they can set their password.
+Organization owners can assign and manage permissions for managers, controlling their access to different parts of the system.
+Organization owners can add or delete managers and modify their permissions.
+Admin Features:
+
+The system admin can view all organizations, events, orders, tickets, check-ins, managers, and permissions.
+The admin can create, update, and delete permissions that organization owners can assign to their managers.
+Authentication and Authorization:
+
+The system uses Firebase Authentication for user registration and login.
+Middleware ensures that only logged-in users with the appropriate permissions can access restricted areas.
+Users without the necessary permissions see a warning message and are prompted to contact their organization owner.
+User Experience:
+After logging in, users are redirected to the restricted area where they can view content based on their roles and permissions.
+Unauthorized users attempting to access restricted pages are redirected to the login page or shown a permission warning.
+Performance Optimization:
+Utilizes Next.js Server Components to efficiently render server-side content.
+Implements <Suspense> to handle asynchronous loading of components, ensuring a seamless user experience.
+Static Generation (SSG) and Incremental Static Regeneration (ISR):
+Use SSG to pre-render pages at build time for content that doesn’t change often.
+Use ISR to update static content after the site has been built, allowing for dynamic data updates without a full rebuild.
+Dynamic Routing:
+Utilize dynamic routing for pages like events, products, orders, tickets, etc., using Next.js file-based routing.
+API Routes:
+Implement API routes to handle backend logic directly within the Next.js application, facilitating the transition to an API-based architecture.
+Middleware:
+Use middleware to handle authentication and authorization, ensuring that users have the right permissions before accessing specific pages.
+React Context:
+Manage global state using React Context, such as user authentication and organization data.
+React Query:
+Use React Query for data fetching, caching, synchronization, and more, paired with <Suspense> for handling asynchronous data loading.
+Error Boundaries:
+Implement Error Boundaries to catch JavaScript errors in the component tree, log those errors, and display a fallback UI.
+Image Optimization:
+Use the next/image component for automatic image optimization.
+Environment Variables:
+
+Use environment variables to manage different settings and secrets for development, staging, and production environments.
+Future Transition to API with Cloud Functions:
+
+Initially, Firestore CRUD operations are performed directly from the client.
+Plans to refactor the system to use an API that interacts with Firebase Cloud Functions for Firestore CRUD operations, enhancing security and scalability.
+Technical Stack:
+
+Frontend: Next.js with the App Router, Server Components, <Suspense>, React Query, and Image Optimization
+Backend: Firebase Authentication and Firestore, with a future transition to using Firebase Cloud Functions for API calls
+
+
+my-ticketing-system/
+├── public/
+│   ├── images/
+│   └── ...
+├── src/
+│   ├── app/
+│   │   ├── auth/
+│   │   │   ├── login/
+│   │   │   │   └── page.js
+│   │   │   ├── register/
+│   │   │   │   └── page.js
+│   │   │   ├── invite/
+│   │   │   │   └── page.js
+│   │   ├── dashboard/
+│   │   │   ├── organisation/
+│   │   │   │   ├── events/
+│   │   │   │   │   ├── create/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── [eventId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── products/
+│   │   │   │   │   ├── create/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── [productId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── orders/
+│   │   │   │   │   ├── [orderId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── tickets/
+│   │   │   │   │   ├── create/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── [ticketId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── checkins/
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── stats/
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── managers/
+│   │   │   │   │   ├── invite/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── [managerId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── permissions/
+│   │   │   │   │   └── page.js
+│   │   │   │   └── page.js
+│   │   │   ├── admin/
+│   │   │   │   ├── organisations/
+│   │   │   │   │   ├── [organisationId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── events/
+│   │   │   │   │   ├── [eventId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── orders/
+│   │   │   │   │   ├── [orderId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── tickets/
+│   │   │   │   │   ├── [ticketId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── checkins/
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── stats/
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── managers/
+│   │   │   │   │   ├── [managerId]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── permissions/
+│   │   │   │   │   └── page.js
+│   │   │   │   └── page.js
+│   │   ├── layout.js
+│   │   ├── page.js
+│   │   ├── _middleware.js
+│   │   └── ...
+│   ├── components/
+│   │   ├── Auth/
+│   │   │   ├── LoginForm.js
+│   │   │   ├── RegisterForm.js
+│   │   │   ├── InviteForm.js
+│   │   │   └── ...
+│   │   ├── Dashboard/
+│   │   │   ├── Organisation/
+│   │   │   │   ├── EventForm.js
+│   │   │   │   ├── ProductForm.js
+│   │   │   │   ├── OrderForm.js
+│   │   │   │   ├── TicketForm.js
+│   │   │   │   ├── ManagerForm.js
+│   │   │   │   └── ...
+│   │   │   ├── Admin/
+│   │   │   │   ├── OrganisationList.js
+│   │   │   │   ├── EventList.js
+│   │   │   │   ├── OrderList.js
+│   │   │   │   ├── TicketList.js
+│   │   │   │   ├── CheckinList.js
+│   │   │   │   ├── ManagerList.js
+│   │   │   │   ├── PermissionList.js
+│   │   │   │   └── ...
+│   │   │   ├── Sidebar.js
+│   │   │   ├── Navbar.js
+│   │   │   └── ...
+│   ├── context/
+│   │   ├── AuthContext.js
+│   │   ├── OrganisationContext.js
+│   │   └── ...
+│   ├── hooks/
+│   │   ├── useAuth.js
+│   │   ├── useOrganisation.js
+│   │   └── ...
+│   ├── lib/
+│   │   ├── firebase.js
+│   │   ├── auth.js
+│   │   ├── firestore.js
+│   │   ├── api.js  # New file for API interactions
+│   │   └── ...
+│   ├── styles/
+│   │   ├── globals.css
+│   │   └── ...
+│   ├── utils/
+│   │   ├── permissions.js
+│   │   └── ...
+│   ├── pages/
+│   │   └── api/
+│   │       ├── auth/
+│   │       │   ├── login.js
+│   │       │   ├── register.js
+│   │       │   ├── invite.js
+│   │       │   └── ...
+│   │       ├── organisations/
+│   │       │   ├── [organisationId].js
+│   │       │   └── ...
+│   │       ├── events/
+│   │       │   ├── [eventId].js
+│   │       │   └── ...
+│   │       ├── products/
+│   │       │   ├── [productId].js
+│   │       │   └── ...
+│   │       ├── orders/
+│   │       │   ├── [orderId].js
+│   │       │   └── ...
+│   │       ├── tickets/
+│   │       │   ├── [ticketId].js
+│   │       │   └── ...
+│   │       ├── checkins/
+│   │       │   └── ...
+│   │       ├── stats/
+│   │       │   └── ...
+│   │       ├── permissions/
+│   │       │   └── ...
+│   │       └── ...
+│   └── ...
+├── .env.local
+├── next.config.js
+├── jsconfig.json
+├── package.json
+└── ...
+
+
+lib/api.js:
+
+This file will handle interactions with your API routes and, in the future, with Firebase Cloud Functions.
+pages/api/:
+
+This directory contains API routes for handling backend logic. Each route can interact with Firestore directly for now and transition to calling Cloud Functions later.
+Enhanced Features and Optimizations:
+
+Server Components: Use Server Components to fetch data on the server and pass it to the client, improving performance.
+<Suspense>: Implement <Suspense> to handle asynchronous loading of components.
+Static Generation (SSG) and Incremental Static Regeneration (ISR): Use these features to optimize the loading of static content.
+Dynamic Routing: Utilize Next.js dynamic routing for resources like events, products, and orders.
+Middleware: Use middleware for handling authentication and authorization.
+React Context: Manage global state using React Context.
+React Query: Use React Query for efficient data fetching and caching.
+Error Boundaries: Implement Error Boundaries to handle errors gracefully.
+Image Optimization: Use the next/image component for automatic image optimization.
+Environment Variables: Manage different settings and secrets for various environments.
