@@ -15,7 +15,8 @@ export async function middleware(request) {
     console.log('USE_SECURE_COOKIES:', process.env.USE_SECURE_COOKIES);
     console.log('NEXT_PUBLIC_FIREBASE_PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
     console.log('FIREBASE_ADMIN_CLIENT_EMAIL:', process.env.FIREBASE_ADMIN_CLIENT_EMAIL);
-    console.log('FIREBASE_ADMIN_PRIVATE_KEY:', process.env.FIREBASE_ADMIN_PRIVATE_KEY); // Mask the private key for security
+    console.log('FIREBASE_ADMIN_PRIVATE_KEY:', process.env.FIREBASE_ADMIN_PRIVATE_KEY);
+    console.log('FIREBASE_ADMIN_PRIVATE_KEY CLEARED:', process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n')); // Mask the private key for security
 
     if(process.env.USE_SECURE_COOKIES === 'true')
         console.log("Using secure cookies");
