@@ -5,26 +5,6 @@ import { firebaseClientConfig, firebaseServerConfig } from './config/firebase';
 const PUBLIC_PATHS = ['/auth/register', '/auth/login', '/auth/reset-password'];
 
 export async function middleware(request) {
-    console.log("Middleware invoked");
-    
-
-    // Log environment variables
-    console.log('Environment Variables:');
-    console.log('AUTH_COOKIE_SIGNATURE_KEY_CURRENT:', process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT);
-    console.log('AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS:', process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS);
-    console.log('USE_SECURE_COOKIES:', process.env.USE_SECURE_COOKIES);
-    console.log('NEXT_PUBLIC_FIREBASE_PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
-    console.log('FIREBASE_ADMIN_CLIENT_EMAIL:', process.env.FIREBASE_ADMIN_CLIENT_EMAIL);
-    console.log('FIREBASE_ADMIN_PRIVATE_KEY:', process.env.FIREBASE_ADMIN_PRIVATE_KEY);
-    console.log('FIREBASE_ADMIN_PRIVATE_KEY CLEARED:', process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n')); // Mask the private key for security
-
-    if(process.env.USE_SECURE_COOKIES === 'true')
-        console.log("Using secure cookies");
-    else
-        console.log("Not using secure cookies");
-    // Log Firebase configurations
-    console.log('Firebase Client Config:', firebaseClientConfig);
-    console.log('Firebase Server Config:', firebaseServerConfig);
 
     try {
         return authMiddleware(request, {
