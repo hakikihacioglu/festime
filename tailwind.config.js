@@ -11,7 +11,9 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }
 /** @type {import('tailwindcss').Config} */
 module.exports = config

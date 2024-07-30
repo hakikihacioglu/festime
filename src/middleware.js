@@ -1,75 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { authMiddleware, redirectToLogin, redirectToHome } from 'next-firebase-auth-edge';
-import { firebaseClientConfig, firebaseServerConfig } from './config/firebase';
+// middleware.js
+import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import createIntlMiddleware from 'next-intl/middleware';
 
-const PUBLIC_PATHS = ['/auth/register', '/auth/login', '/auth/reset-password'];
+const intlMiddleware = createIntlMiddleware({
+    locales: ['en', 'fr', 'de', 'tr'], // Add your supported locales here
+    defaultLocale: 'en'
+});
 
-export async function middleware(request) {
+export async function middleware(req) {
+    const { pathname } = req.nextUrl;
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    try {
-        return authMiddleware(request, {
-            loginPath: '/api/login',
-            logoutPath: '/api/logout',
-            apiKey: firebaseClientConfig.apiKey,
-            cookieName: firebaseServerConfig.cookieName,
-            cookieSignatureKeys: [
-                process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT,
-                process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS,
-            ],
-            cookieSerializeOptions: {
-                path: '/',
-                httpOnly: true,
-                secure: process.env.USE_SECURE_COOKIES === 'true',
-                maxAge: 60 * 60 * 24 * 7, // 1 week
-                sameSite: 'strict',
-            },
-            serviceAccount: {
-                projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-                clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-                privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'),
-            },
-            enableMultipleCookies: true,
-            debug: false,
-            handleValidToken: async ({ token, decodedToken }, headers) => {
-                const { origin, pathname } = request.nextUrl;
-                if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
-                    console.log("Redirecting to dashboard");
-                    return NextResponse.redirect(`${origin}/dashboard`);
-                }
+    const isAuthPath = pathname.includes('/auth');
+    const isDashboardPath = pathname.includes('/dashboard');
 
-                return NextResponse.next({
-                    request: {
-                        headers,
-                    },
-                });
-            },
-            handleInvalidToken: async (reason) => {
-                console.info('Missing or malformed credentials', { reason });
-                return redirectToLogin(request, {
-                    path: '/auth/login',
-                    publicPaths: PUBLIC_PATHS,
-                });
-            },
-            handleError: async (error) => {
-                console.error('Unhandled authentication error', { error });
-                return redirectToLogin(request, {
-                    path: '/auth/login',
-                    publicPaths: PUBLIC_PATHS,
-                });
-            },
-        });
-    } catch (error) {
-        console.error('Middleware error', { error });
-        return new Response('Internal Server Error', { status: 500 });
+    /*
+    if (!token && isDashboardPath) {
+        return NextResponse.redirect(new URL(`/${req.nextUrl.locale}/auth/signin`, req.url));
     }
+
+    if (token && isAuthPath) {
+        return NextResponse.redirect(new URL(`/${req.nextUrl.locale}/dashboard`, req.url));
+    }
+    */
+
+    return intlMiddleware(req);
 }
 
 export const config = {
-    matcher: [
-        '/api/login',
-        '/api/logout',
-        '/auth/:path*',
-        '/dashboard/:path*',
-        '/ssdashboard/:path*',
-    ],
+    matcher: ['/', '/(de|en|fr|tr)/:path*'],
 };
