@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import Script from 'next/script';
 
+
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
