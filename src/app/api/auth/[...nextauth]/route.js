@@ -7,7 +7,8 @@ export const authOptions = {
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        recaptchaToken: { label: "reCAPTCHA Token", type: "text" },
       },
       async authorize(credentials) {
         try {
@@ -18,7 +19,8 @@ export const authOptions = {
             },
             body: JSON.stringify({
               email: credentials.email,
-              password: credentials.password
+              password: credentials.password,
+              recaptchaToken: credentials.recaptchaToken
             })
           });
 

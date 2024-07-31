@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Script from 'next/script';
 
 const SignIn = () => {
@@ -12,10 +12,15 @@ const SignIn = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
   const t = useTranslations();
-  const locale = router.locale;
+  const locale = useLocale();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (typeof window.grecaptcha === 'undefined') {
+      setError('reCAPTCHA is not loaded properly.');
+      return;
+    }
 
     window.grecaptcha.ready(() => {
       window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: 'signin' }).then(async (token) => {
@@ -24,7 +29,7 @@ const SignIn = () => {
             redirect: false,
             email,
             password,
-            recaptchaToken: token,
+            recaptchaToken: token, // Pass the reCAPTCHA token
           });
 
           if (!response.error) {
