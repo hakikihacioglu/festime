@@ -82,7 +82,7 @@ const Register = () => {
 
   return (
     <div>
-      <h1>{t('Register')} V1.0</h1>
+      <h1>{t('Register')} V2.0</h1>
       {error && <p style={{ color: 'red' }}>{t(error)}</p>}
       <form id="register-form" onSubmit={handleRegister}>
         <div>
