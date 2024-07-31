@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
@@ -11,60 +11,72 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [organisationName, setOrganisationName] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
   const { executeRecaptcha } = useReCaptcha();
 
-  const handleSubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        // Generate ReCaptcha token for registration
-        const registerToken = await executeRecaptcha('register');
+    try {
+      // Basic password strength check
+      if (password.length < 8) {
+        throw new Error(t('Password must be at least 8 characters long'));
+      }
 
-        const response = await fetch('https://europe-west3-festime.cloudfunctions.net/api/organisations/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email, password, organisationName, recaptchaToken: registerToken })
-        });
+      // Generate ReCaptcha token for registration
+      const registerRecaptchaToken = await executeRecaptcha('register');
 
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.message || 'Failed to register');
-        }
-
-        // Generate a new reCAPTCHA token for login
-        const loginToken = await executeRecaptcha('login');
-
-        // Automatically sign in the user after successful registration
-        const signInResult = await signIn('credentials', {
-          redirect: false,
+      const response = await fetch('https://europe-west3-festime.cloudfunctions.net/api/organisations/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           email,
           password,
-          recaptchaToken: loginToken, // Pass the new reCAPTCHA token for login
-        });
+          organisationName,
+          recaptchaToken: registerRecaptchaToken
+        })
+      });
 
-        if (!signInResult.error) {
-          router.push(`/${locale}/dashboard`);
-        } else {
-          setError(signInResult.error);
-        }
-      } catch (error) {
-        setError(error.message);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to register');
       }
-    },
-    [executeRecaptcha, email, password, organisationName, locale, router]
-  );
+
+      // Generate a new reCAPTCHA token for login
+      const loginRecaptchaToken = await executeRecaptcha('login');
+
+      // Automatically sign in the user after successful registration
+      const signInResult = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+        recaptchaToken: loginRecaptchaToken,
+      });
+
+      if (!signInResult.error) {
+        router.push(`/${locale}/dashboard`);
+      } else {
+        throw new Error(signInResult.error);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div>
       <h1>{t('Register')}</h1>
-      {error && <p style={{ color: 'red' }}>{t(error)}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form id="register-form" onSubmit={handleSubmit}>
         <div>
           <label>{t('Email')}:</label>
@@ -82,6 +94,7 @@ const Register = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={8}
           />
         </div>
         <div>
@@ -93,7 +106,9 @@ const Register = () => {
             required
           />
         </div>
-        <button type="submit">{t('Register')}</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? t('Registering') : t('Register')}
+        </button>
       </form>
     </div>
   );

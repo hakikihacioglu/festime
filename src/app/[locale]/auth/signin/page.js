@@ -4,50 +4,54 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import Script from 'next/script';
+import Link from 'next/link';
+import { useReCaptcha } from 'next-recaptcha-v3';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
+  const { executeRecaptcha } = useReCaptcha();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-    if (typeof window.grecaptcha === 'undefined') {
-      setError('reCAPTCHA is not loaded properly.');
-      return;
-    }
+    try {
+      // Generate ReCaptcha token for login
+      const loginRecaptchaToken = await executeRecaptcha('login');
 
-    window.grecaptcha.ready(() => {
-      window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: 'signin' }).then(async (token) => {
-        try {
-          const response = await signIn('credentials', {
-            redirect: false,
-            email,
-            password,
-            recaptchaToken: token, // Pass the reCAPTCHA token
-          });
-
-          if (!response.error) {
-            router.push(`/${locale}/dashboard`);
-          } else {
-            setError(response.error);
-          }
-        } catch (error) {
-          setError(error.message);
-        }
+      const response = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+        recaptchaToken: loginRecaptchaToken, // Pass the reCAPTCHA token
       });
-    });
+
+      if (!response.error) {
+        router.push(`/${locale}/dashboard`);
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div>
+      <Link href={`/${locale}/dashboard`} className="text-blue-500 underline">
+        Dashboard
+      </Link>
       <h1>{t('Login')}</h1>
-      {error && <p style={{ color: 'red' }}>{t(error)}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <div>
           <label>{t('Email')}:</label>
@@ -67,12 +71,10 @@ const SignIn = () => {
             required
           />
         </div>
-        <button type="submit">{t('Login')}</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? t('Logging in...') : t('Login')}
+        </button>
       </form>
-      <Script
-        src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-        strategy="afterInteractive"
-      />
     </div>
   );
 };
