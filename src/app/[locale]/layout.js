@@ -3,6 +3,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import ClientLayout from './ClientLayout';
 import '@/styles/tailwind.css'
 import Providers from '@/components/Providers';
+import { ReCaptchaProvider } from 'next-recaptcha-v3';
 
 
 
@@ -27,7 +28,11 @@ export default async function RootLayout({ children }) {
       <body className="h-full">
         <NextIntlClientProvider messages={messages}>
           <Providers>
-              <ClientLayout>{children}</ClientLayout>
+            <ClientLayout>
+              <ReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}>
+                {children}
+              </ReCaptchaProvider>
+            </ClientLayout>
           </Providers>
         </NextIntlClientProvider>
       </body>
