@@ -10,7 +10,7 @@ const intlMiddleware = createIntlMiddleware({
 
 export async function middleware(req) {
     const { pathname } = req.nextUrl;
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_JWT_SECRET });
 
     const isAuthPath = pathname.includes('/auth');
     const isDashboardPath = pathname.includes('/dashboard');

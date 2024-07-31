@@ -1,15 +1,16 @@
-// app/[locale]/auth/register/page.js
 'use client';
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
+import Script from 'next/script';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [organisationName, setOrganisationName] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
   const [error, setError] = useState(null);
   const router = useRouter();
   const t = useTranslations();
@@ -18,13 +19,19 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate reCAPTCHA
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA.');
+      return;
+    }
+
     try {
-      const response = await fetch('https://europe-west3-festime.cloudfunctions.net/registerOrganisation', {
+      const response = await fetch('https://europe-west3-festime.cloudfunctions.net/api/organisations/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password, organisationName })
+        body: JSON.stringify({ email, password, organisationName, recaptchaToken })
       });
 
       const result = await response.json();
@@ -50,11 +57,20 @@ const Register = () => {
     }
   };
 
+  const handleReCAPTCHA = () => {
+    window.grecaptcha.ready(() => {
+      window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: 'register' }).then((token) => {
+        setRecaptchaToken(token);
+        handleSubmit();
+      });
+    });
+  };
+
   return (
     <div>
       <h1>{t('Register')}</h1>
       {error && <p style={{ color: 'red' }}>{t(error)}</p>}
-      <form onSubmit={handleSubmit}>
+      <form id="register-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label>{t('Email')}:</label>
           <input
@@ -82,8 +98,12 @@ const Register = () => {
             required
           />
         </div>
-        <button type="submit">{t('Register')}</button>
+        <button type="submit" onClick={handleReCAPTCHA}>{t('Register')}</button>
       </form>
+      <Script
+        src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+        strategy="afterInteractive"
+      />
     </div>
   );
 };

@@ -11,7 +11,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
-          const response = await fetch('https://europe-west3-festime.cloudfunctions.net/loginUser', {
+          const response = await fetch('https://europe-west3-festime.cloudfunctions.net/api/users/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ export const authOptions = {
       return token;
     }
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_JWT_SECRET,
 };
 
 const handler = NextAuth(authOptions);
